@@ -42,15 +42,16 @@ Record with `?recording=1` for stable layout.
 
 ## Links
 
+See [SUBMISSION_URLS.md](SUBMISSION_URLS.md) for the canonical list (update live demo after Vercel deploy).
+
 | Resource | URL |
 |----------|-----|
 | GitHub | https://github.com/dorakingx/talk2buy-storefront |
-| Live demo | Deploy to Vercel — set `NEXT_PUBLIC_APP_URL` to `https://YOUR-APP.vercel.app` |
-| Demo video | Add YouTube/Loom link after recording |
+| Live demo | https://YOUR-APP.vercel.app *(set in SUBMISSION_URLS.md after deploy)* |
+| Demo video | Add YouTube/Loom link in SUBMISSION_URLS.md after recording |
 
 ## Before submit
 
+- [SUBMISSION_URLS.md](SUBMISSION_URLS.md)
 - [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md)
-
-Replace `YOUR-APP` and video `TBD` before final submission.

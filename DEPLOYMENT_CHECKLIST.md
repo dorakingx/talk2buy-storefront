@@ -45,8 +45,8 @@ Copy `.env.example` to `.env.local` and set as needed:
 
 ## Pre-submission
 
-- [ ] Replace `YOUR-APP.vercel.app` in README and HACKATHON_SUBMISSION with real deploy URL
-- [ ] Add demo video link (no `TBD` in submission docs)
+- [ ] Update [SUBMISSION_URLS.md](SUBMISSION_URLS.md) with real Vercel URL (sync README / HACKATHON)
+- [ ] Add demo video link in SUBMISSION_URLS.md after recording
 - [ ] Screenshots committed under `docs/screenshots/`
 - [ ] GitHub repo is public
 

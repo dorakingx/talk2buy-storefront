@@ -8,6 +8,8 @@ Built with **ElevenLabs** · Powered by **Stripe** · **Demo mode** available
 
 Built for the **ElevenLabs x Stripe** hackathon. Judges: see [HACKATHON_SUBMISSION.md](HACKATHON_SUBMISSION.md).
 
+**Links:** [SUBMISSION_URLS.md](SUBMISSION_URLS.md) (live demo + video — update after deploy)
+
 ## Quick start
 
 ```bash
@@ -50,7 +52,7 @@ Recording tip: use [http://localhost:3000/?recording=1](http://localhost:3000/?r
 1. Import [github.com/dorakingx/talk2buy-storefront](https://github.com/dorakingx/talk2buy-storefront)
 2. Add variables from `.env.example`
 3. Set `NEXT_PUBLIC_APP_URL` to `https://YOUR-APP.vercel.app`
-4. Update live demo URL in README and HACKATHON_SUBMISSION after deploy
+4. Update [SUBMISSION_URLS.md](SUBMISSION_URLS.md) with your Vercel URL, then sync README / HACKATHON
 
 ## Pre-submission checklist
 
@@ -70,6 +72,7 @@ See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for full QA steps.
 |------|---------|
 | [HACKATHON_SUBMISSION.md](HACKATHON_SUBMISSION.md) | Judge-facing summary |
 | [DEMO_SCRIPT.md](DEMO_SCRIPT.md) | Video script |
+| [SUBMISSION_URLS.md](SUBMISSION_URLS.md) | Live demo + video links (single place to edit) |
 | [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) | Lint, build, deploy, QA |
 
 ## License

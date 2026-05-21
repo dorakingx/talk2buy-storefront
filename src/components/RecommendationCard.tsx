@@ -78,7 +78,6 @@ export function RecommendationCard({
       });
     } finally {
       setSampleLoading(false);
-      onVoiceStateChange?.("idle");
     }
   }
 
