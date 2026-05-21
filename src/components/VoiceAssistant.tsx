@@ -123,7 +123,14 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
               matchSignals: data.matchSignals,
               expectedOutcome: data.expectedOutcome,
             });
-            onJudgeGuidePhase?.("awaiting_sample");
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                onJudgeGuidePhase?.("awaiting_sample");
+                document
+                  .querySelector('[data-judge-target="hear-sample"]')
+                  ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+              });
+            });
           }
 
           await speak(data.reply);
@@ -166,7 +173,13 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
       const SpeechRecognition =
         typeof window !== "undefined" &&
         (window.SpeechRecognition || window.webkitSpeechRecognition);
-      if (!SpeechRecognition) return;
+      if (!SpeechRecognition) {
+        showToast(
+          "Push-to-talk is not supported in this browser — use quick replies or type your message.",
+          "info"
+        );
+        return;
+      }
 
       stopAllVoice();
       pttTranscriptRef.current = "";

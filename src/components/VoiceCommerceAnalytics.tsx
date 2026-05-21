@@ -22,9 +22,17 @@ export function VoiceCommerceAnalytics() {
           Demo analytics
         </span>
       </div>
-      <p className="text-slate-400 mb-8 italic">
+      <p className="text-slate-400 mb-6 italic">
         Every voice preview is a measurable step toward purchase.
       </p>
+
+      <div className="glass-card rounded-xl p-5 mb-8 border border-violet-500/20">
+        <p className="text-xs text-violet-400 font-semibold uppercase mb-2">Demo insight</p>
+        <p className="text-base text-slate-200 leading-relaxed">
+          Voice previews convert passive visitors into confident buyers.
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {cards.map((c) => (
           <div key={c.label} className="glass-card rounded-xl p-5 relative overflow-hidden">

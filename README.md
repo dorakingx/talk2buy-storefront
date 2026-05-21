@@ -8,6 +8,8 @@ Talk2Buy is a voice-first commerce platform for digital creators. Visitors talk 
 
 Built for the **ElevenLabs x Stripe** hackathon.
 
+**Judges:** see [HACKATHON_SUBMISSION.md](HACKATHON_SUBMISSION.md) for a concise overview.
+
 ## One-sentence pitch
 
 Turn live conversations into product recommendations, voice previews, and instant Stripe checkout — without a static, impersonal storefront.

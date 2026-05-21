@@ -65,7 +65,7 @@ export function RecommendationCard({
     });
 
     try {
-      const result = await playVoiceText(previewText, {
+      await playVoiceText(previewText, {
         onStart: () => onVoiceStateChange?.("speaking"),
         onEnd: () => {
           onVoiceStateChange?.("idle");
@@ -74,11 +74,6 @@ export function RecommendationCard({
         },
         onError: (msg) => showToast(msg, "info"),
       });
-      if (result.demo && result.usedBrowserFallback) {
-        showToast("Demo voice mode (browser)", "info");
-        saveDemoContext({ voicePreviewPlayed: true });
-        onSampleEnded?.();
-      }
     } finally {
       setSampleLoading(false);
       onVoiceStateChange?.("idle");

@@ -11,20 +11,26 @@ interface HeroSectionProps {
 
 export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps) {
   return (
-    <section id="hero" className="gradient-hero py-20 md:py-28 px-4 scroll-mt-20">
+    <section id="hero" className="gradient-hero py-14 md:py-20 px-4 scroll-mt-20">
       <div className="max-w-5xl mx-auto text-center animate-fade-in">
-        <p className="text-cyan-400 text-sm font-medium tracking-wider uppercase mb-4">
+        <p className="text-cyan-400 text-sm font-medium tracking-wider uppercase mb-3">
           ElevenLabs x Stripe Hackathon · Talk2Buy
         </p>
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-slate-100">
-          Turn conversations into sales with an{" "}
-          <span className="text-gradient">AI voice storefront</span>.
-        </h1>
-        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-2">
-          An ElevenLabs-powered sales assistant that recommends products, speaks
-          to customers, and drives purchases through Stripe.
+        <p className="text-lg md:text-xl font-semibold text-slate-100 mb-4 max-w-2xl mx-auto">
+          Talk2Buy turns voice conversations into revenue.
         </p>
-        <p className="text-sm text-violet-400/90 mb-10 italic">
+
+        <HeroRevenuePipeline />
+
+        <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight text-slate-100">
+          An <span className="text-gradient">AI voice storefront</span> that sells while
+          customers talk.
+        </h1>
+        <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto mb-2">
+          ElevenLabs-powered recommendations and previews, Stripe-powered checkout, and
+          personalized audio that closes the loop.
+        </p>
+        <p className="text-sm text-violet-400/90 mb-8 italic">
           Voice is not just content. Voice is the sales interface.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -43,7 +49,6 @@ export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps
           </Link>
           {onRunJudgeDemo && <JudgeModeButton onRun={onRunJudgeDemo} />}
         </div>
-        <HeroRevenuePipeline />
         {onRunJudgeDemo && (
           <p className="mt-4 text-sm text-slate-500">
             Judges:{" "}
@@ -53,8 +58,7 @@ export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps
               className="text-fuchsia-400/90 hover:text-fuchsia-300 underline-offset-2 hover:underline"
             >
               run the guided demo
-            </button>{" "}
-            from the pipeline above
+            </button>
           </p>
         )}
       </div>

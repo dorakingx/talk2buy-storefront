@@ -1,4 +1,5 @@
 import type { VoiceGenerateResponse } from "@/types";
+import { VOICE_MSG } from "@/lib/voice-messages";
 
 export interface VoiceResult {
   url: string | null;
@@ -28,6 +29,20 @@ function revokeUrl(url: string) {
 function revokeAllUrls() {
   objectUrls.forEach((url) => URL.revokeObjectURL(url));
   objectUrls.clear();
+}
+
+/** Stop audio/TTS only — does not revoke blob URLs (safe before playing a new URL). */
+function stopPlaybackOnly(): void {
+  playbackGeneration += 1;
+  isPlaying = false;
+  if (typeof window !== "undefined") {
+    window.speechSynthesis?.cancel();
+  }
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.src = "";
+    activeAudio = null;
+  }
 }
 
 export async function fetchVoice(text: string): Promise<VoiceResult> {
@@ -61,6 +76,21 @@ export async function fetchVoice(text: string): Promise<VoiceResult> {
   };
 }
 
+function tryBrowserVoice(
+  text: string,
+  callbacks: VoicePlaybackCallbacks | undefined,
+  errorMessage: string
+): VoiceResult {
+  const ok = speakWithBrowser(text, callbacks);
+  if (ok) {
+    callbacks?.onError?.(errorMessage);
+    return { url: null, demo: true, usedBrowserFallback: true };
+  }
+  callbacks?.onError?.(VOICE_MSG.browserUnavailable);
+  callbacks?.onEnd?.();
+  return { url: null, demo: true };
+}
+
 export function speakWithBrowser(
   text: string,
   callbacks?: VoicePlaybackCallbacks
@@ -78,7 +108,7 @@ export function speakWithBrowser(
   };
   utterance.onerror = () => {
     isPlaying = false;
-    callbacks?.onError?.("Browser voice playback failed");
+    callbacks?.onError?.(VOICE_MSG.browserUnavailable);
     callbacks?.onEnd?.();
   };
   isPlaying = true;
@@ -86,17 +116,9 @@ export function speakWithBrowser(
   return true;
 }
 
+/** Full teardown: stop playback and revoke all object URLs. */
 export function stopAllVoice(): void {
-  playbackGeneration += 1;
-  isPlaying = false;
-  if (typeof window !== "undefined") {
-    window.speechSynthesis?.cancel();
-  }
-  if (activeAudio) {
-    activeAudio.pause();
-    activeAudio.src = "";
-    activeAudio = null;
-  }
+  stopPlaybackOnly();
   revokeAllUrls();
 }
 
@@ -108,10 +130,12 @@ export async function playVoiceText(
   text: string,
   callbacks?: VoicePlaybackCallbacks
 ): Promise<VoiceResult> {
+  // 1. Stop previous playback and revoke old URLs before starting a new request.
   if (isPlaying) {
     stopAllVoice();
   }
 
+  // 2. Claim this playback generation.
   const gen = ++playbackGeneration;
   const wrapped: VoicePlaybackCallbacks = {
     onStart: () => {
@@ -132,39 +156,47 @@ export async function playVoiceText(
     },
   };
 
+  // 3. Fetch or generate new audio.
   const result = await fetchVoice(text);
-  if (gen !== playbackGeneration) return result;
 
+  // 4. Abandon if superseded while fetching.
+  if (gen !== playbackGeneration) {
+    if (result.url) revokeUrl(result.url);
+    return result;
+  }
+
+  // 5. Play blob URL from ElevenLabs.
   if (result.url) {
-    await playAudioUrl(result.url, wrapped, gen);
-    return result;
+    const played = await playAudioUrl(result.url, wrapped, gen);
+    if (played) return result;
+    if (gen !== playbackGeneration) return result;
+    return tryBrowserVoice(text, wrapped, VOICE_MSG.audioPlaybackFailed);
   }
 
+  // 6. Demo / ElevenLabs unavailable — browser fallback.
   if (result.demo) {
-    const ok = speakWithBrowser(text, wrapped);
-    if (ok) {
-      callbacks?.onError?.("Demo voice mode (browser)");
-      return { ...result, usedBrowserFallback: true };
-    }
-    wrapped.onError?.("Voice unavailable — please read the message on screen");
-    wrapped.onEnd?.();
-    return result;
+    return tryBrowserVoice(text, wrapped, VOICE_MSG.elevenLabsUnavailable);
   }
 
-  wrapped.onError?.(result.message ?? "Voice playback failed");
+  wrapped.onError?.(result.message ?? VOICE_MSG.browserUnavailable);
   wrapped.onEnd?.();
   return result;
 }
 
+/**
+ * Play a blob URL. Does not call stopAllVoice() — only stops the prior element.
+ * Revokes this URL after playback ends or errors.
+ */
 export function playAudioUrl(
   url: string,
   callbacks?: VoicePlaybackCallbacks,
   generation?: number
-): Promise<void> {
+): Promise<boolean> {
   const gen = generation ?? ++playbackGeneration;
 
   return new Promise((resolve) => {
-    stopAllVoice();
+    // Stop prior element without revoking URLs in the set (including this one).
+    stopPlaybackOnly();
     playbackGeneration = gen;
 
     const audio = new Audio(url);
@@ -173,7 +205,7 @@ export function playAudioUrl(
 
     const finish = (errorMsg?: string) => {
       if (gen !== playbackGeneration) {
-        resolve();
+        resolve(false);
         return;
       }
       isPlaying = false;
@@ -181,14 +213,14 @@ export function playAudioUrl(
       revokeUrl(url);
       if (errorMsg) callbacks?.onError?.(errorMsg);
       callbacks?.onEnd?.();
-      resolve();
+      resolve(!errorMsg);
     };
 
     audio.onplay = () => {
       if (gen === playbackGeneration) callbacks?.onStart?.();
     };
     audio.onended = () => finish();
-    audio.onerror = () => finish("Audio playback failed");
-    audio.play().catch(() => finish("Could not play audio"));
+    audio.onerror = () => finish(VOICE_MSG.audioPlaybackFailed);
+    audio.play().catch(() => finish(VOICE_MSG.audioPlaybackFailed));
   });
 }

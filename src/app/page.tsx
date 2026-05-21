@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { DemoFlowSteps } from "@/components/DemoFlowSteps";
+import { DemoReadinessBanner } from "@/components/DemoReadinessBanner";
 import { HeroSection } from "@/components/HeroSection";
 import { JudgeDemoGuide } from "@/components/JudgeDemoGuide";
 import { LiveSalesPanel } from "@/components/LiveSalesPanel";
@@ -31,6 +32,10 @@ export default function HomePage() {
   }
 
   function handleDismissJudgeGuide() {
+    if (judgeGuidePhase === "awaiting_sample") {
+      setJudgeGuidePhase("awaiting_checkout");
+      return;
+    }
     setJudgeGuidePhase("done");
     showToast("Continue to checkout when ready", "info");
   }
@@ -39,6 +44,7 @@ export default function HomePage() {
 
   return (
     <>
+      <DemoReadinessBanner />
       <HeroSection
         onStartTalking={handleStartTalking}
         onRunJudgeDemo={handleRunJudgeDemo}

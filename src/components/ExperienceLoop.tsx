@@ -34,7 +34,7 @@ export function ExperienceLoop({
       done: !!ctx?.voicePreviewPlayed,
     },
     {
-      label: "Purchase completed",
+      label: "Payment completed",
       value: "Stripe checkout confirmed",
       done: true,
     },
@@ -52,6 +52,10 @@ export function ExperienceLoop({
       </h2>
       <p className="text-sm text-slate-400 mb-6">
         Talk2Buy turns voice conversations into revenue — here is your full loop.
+      </p>
+      <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+        The conversation did not end at checkout — it became the product experience you
+        receive.
       </p>
       <ol className="space-y-4">
         {steps.map((s, i) => (
