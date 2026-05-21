@@ -1,9 +1,11 @@
 "use client";
 
+import { DemoFlowSteps } from "@/components/DemoFlowSteps";
 import { HeroSection } from "@/components/HeroSection";
 import { LiveSalesPanel } from "@/components/LiveSalesPanel";
 import { ProductCard } from "@/components/ProductCard";
 import { VoiceAssistant } from "@/components/VoiceAssistant";
+import { WhyItMatters } from "@/components/WhyItMatters";
 import { getAllProducts } from "@/lib/products";
 
 export default function HomePage() {
@@ -16,6 +18,8 @@ export default function HomePage() {
   return (
     <>
       <HeroSection onStartTalking={handleStartTalking} />
+      <DemoFlowSteps />
+      <VoiceAssistant id="voice-assistant" />
       <LiveSalesPanel />
       <section className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-slate-100 mb-2">Digital products</h2>
@@ -28,7 +32,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-      <VoiceAssistant id="voice-assistant" />
+      <WhyItMatters />
     </>
   );
 }

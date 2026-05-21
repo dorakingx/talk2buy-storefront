@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,7 +49,9 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <Providers>{children}</Providers>
+        </main>
         <footer className="border-t border-cyan-500/10 py-6 text-center text-sm text-slate-500">
           Voice is not just content anymore. It is a sales interface.
         </footer>

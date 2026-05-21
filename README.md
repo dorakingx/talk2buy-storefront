@@ -1,15 +1,21 @@
 # Talk-to-Buy Storefront
 
-AI voice storefront MVP — visitors chat with an AI shop assistant, receive product recommendations, pay via Stripe Checkout, and get a personalized ElevenLabs thank-you message after purchase.
+AI voice commerce platform for creators — an ElevenLabs-powered sales assistant that recommends products, speaks to customers, and drives purchases through Stripe.
+
+## Demo flow (60–90s video)
+
+1. Land on hero → click **Try the voice demo**
+2. Watch auto intro + tap **I want to learn quantum computing**
+3. See **AI Recommended for You** → **Hear sample**
+4. **Buy with Stripe** (or **Try demo checkout** without API keys)
+5. Success page: personalized thank-you audio + share
+6. Cut to **Dashboard** for metrics and revenue chart
 
 ## Tech stack
 
 - Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- Stripe Checkout
-- ElevenLabs Text-to-Speech
-- Rule-based assistant (optional OpenAI)
+- TypeScript · Tailwind CSS
+- Stripe Checkout · ElevenLabs TTS · Rule-based assistant (optional OpenAI)
 
 ## Getting started
 
@@ -25,47 +31,30 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NEXT_PUBLIC_APP_URL` | Yes | App URL for Stripe redirects (e.g. `http://localhost:3000`) |
-| `STRIPE_SECRET_KEY` | For checkout | Stripe secret key (test mode) |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional | Stripe publishable key |
-| `STRIPE_WEBHOOK_SECRET` | Optional | Reserved for future webhooks |
-| `ELEVENLABS_API_KEY` | For voice | ElevenLabs API key |
-| `ELEVENLABS_VOICE_ID` | For voice | ElevenLabs voice ID |
-| `OPENAI_API_KEY` | Optional | Enables GPT-based assistant replies |
-
-Without Stripe keys, checkout shows a configuration error. Without ElevenLabs keys, voice runs in **demo mode** with an informational message.
-
-## Stripe setup
-
-1. Create a [Stripe](https://stripe.com) account and enable test mode.
-2. Copy **Secret key** → `STRIPE_SECRET_KEY` in `.env.local`.
-3. Use test card `4242 4242 4242 4242` with any future expiry and CVC.
-
-Success redirect: `/checkout/success?session_id={CHECKOUT_SESSION_ID}`
-
-## ElevenLabs setup
-
-1. Sign up at [ElevenLabs](https://elevenlabs.io).
-2. Copy API key → `ELEVENLABS_API_KEY`.
-3. Pick a voice from the voice library → `ELEVENLABS_VOICE_ID`.
-
-## Pages
-
-- `/` — Landing, products, AI assistant
-- `/checkout/success` — Post-payment confirmation + voice message
-- `/dashboard` — Creator dashboard (mock data)
-
-## Deploy to Vercel
-
-1. Push to GitHub and import in Vercel.
-2. Add all env vars from `.env.example`.
-3. Set `NEXT_PUBLIC_APP_URL` to your production URL.
+| `NEXT_PUBLIC_APP_URL` | Yes | App URL for Stripe redirects |
+| `STRIPE_SECRET_KEY` | For live checkout | Without it, demo checkout is used |
+| `ELEVENLABS_API_KEY` | For ElevenLabs audio | Without it, browser SpeechSynthesis fallback |
+| `ELEVENLABS_VOICE_ID` | With ElevenLabs | Voice ID from ElevenLabs library |
+| `OPENAI_API_KEY` | Optional | GPT-based assistant replies |
 
 ## Project structure
 
 ```
-app/           # Pages and API routes
-components/    # UI components
-lib/           # Products, assistant, Stripe, ElevenLabs, mock data
-types/         # TypeScript types
+src/
+  app/              # Pages and API routes
+  components/       # VoiceOrb, VoiceAssistant, RecommendationCard, etc.
+  lib/              # products, assistant, stripe, elevenlabs, voice-client
+  types/
 ```
+
+## Pages
+
+- `/` — Voice-first storefront, products, pitch
+- `/checkout/success` — Post-payment (Stripe or `?demo=1&productId=...`)
+- `/dashboard` — Creator SaaS dashboard with chart
+
+## Deploy to Vercel
+
+1. Import from GitHub
+2. Add env vars from `.env.example`
+3. Set `NEXT_PUBLIC_APP_URL` to production URL

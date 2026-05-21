@@ -1,6 +1,7 @@
 export const liveSalesStats = {
   revenueToday: 12400,
-  conversionRate: 4.2,
+  conversionRate: 4.8,
+  conversionDelta: "+12% vs last week",
   voiceInteractions: 47,
   purchasedProducts: [
     { name: "AI Art Prompt Pack", count: 3 },
@@ -14,7 +15,21 @@ export const dashboardStats = {
   totalOrders: 34,
   avgOrderValue: 2630,
   voiceMessagesGenerated: 28,
+  voiceConversations: 156,
+  conversionRate: 4.8,
+  conversionDelta: "+12% vs last week",
+  topRecommendedProduct: "Quantum Computing Beginner Audio Guide",
 };
+
+export const revenueByDay = [
+  { day: "Mon", amount: 8200 },
+  { day: "Tue", amount: 12400 },
+  { day: "Wed", amount: 9800 },
+  { day: "Thu", amount: 15600 },
+  { day: "Fri", amount: 11200 },
+  { day: "Sat", amount: 18900 },
+  { day: "Sun", amount: 13400 },
+];
 
 export const recentPurchases = [
   {
@@ -61,5 +76,12 @@ export const generatedAudioLog = [
     product: "Quantum Computing Beginner Audio Guide",
     preview: "Thank you, Jordan, for purchasing Quantum Computing...",
     createdAt: "2025-05-21T09:16:00Z",
+  },
+  {
+    id: "a3",
+    customer: "Tomoya H.",
+    product: "Cyberpunk Short Story Audio",
+    preview: "Thank you, Tomoya, for purchasing Cyberpunk Short Story...",
+    createdAt: "2025-05-21T11:00:00Z",
   },
 ];

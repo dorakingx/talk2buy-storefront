@@ -10,6 +10,7 @@ interface SpeechRecognition extends EventTarget {
 }
 
 interface SpeechRecognitionEvent {
+  resultIndex: number;
   results: SpeechRecognitionResultList;
 }
 

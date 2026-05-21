@@ -4,18 +4,30 @@ export interface Product {
   description: string;
   price: number;
   currency: string;
+  sampleScript: string;
+  shortBenefit: string;
+  whatYouGet: string;
+  thankYouClosing: string;
 }
+
+export type VoiceOrbState = "idle" | "listening" | "thinking" | "speaking";
 
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   recommendedProductId?: string;
+  whyItFits?: string;
+  whatYouGet?: string;
+  cta?: string;
 }
 
 export interface AssistantResponse {
   reply: string;
   recommendedProductId?: string;
+  whyItFits?: string;
+  whatYouGet?: string;
+  cta?: string;
 }
 
 export interface StripeSessionResponse {
@@ -29,4 +41,10 @@ export interface StripeSessionResponse {
 export interface VoiceGenerateResponse {
   demo?: boolean;
   message?: string;
+  fallback?: "browser";
+}
+
+export interface AppConfig {
+  stripeEnabled: boolean;
+  elevenLabsEnabled: boolean;
 }

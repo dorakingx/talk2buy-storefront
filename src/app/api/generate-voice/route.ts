@@ -14,6 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         demo: true,
         message: "Voice generation is running in demo mode.",
+        fallback: "browser",
       });
     }
 
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         demo: true,
         message: "Voice generation is running in demo mode.",
+        fallback: "browser",
       });
     }
 
