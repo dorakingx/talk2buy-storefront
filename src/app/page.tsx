@@ -1,21 +1,26 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { DemoFlowSteps } from "@/components/DemoFlowSteps";
 import { HeroSection } from "@/components/HeroSection";
-import { JudgeModeButton } from "@/components/JudgeModeButton";
+import { JudgeDemoGuide } from "@/components/JudgeDemoGuide";
 import { LiveSalesPanel } from "@/components/LiveSalesPanel";
 import { ProductCard } from "@/components/ProductCard";
+import { VoiceCommerceAnalytics } from "@/components/VoiceCommerceAnalytics";
 import {
   VoiceAssistant,
   type VoiceAssistantHandle,
+  type JudgeGuidePhase,
 } from "@/components/VoiceAssistant";
+import { useToast } from "@/components/Toast";
 import { WhyItMatters } from "@/components/WhyItMatters";
 import { ConversationFunnel } from "@/components/ConversationFunnel";
 import { getAllProducts } from "@/lib/products";
 
 export default function HomePage() {
   const assistantRef = useRef<VoiceAssistantHandle>(null);
+  const [judgeGuidePhase, setJudgeGuidePhase] = useState<JudgeGuidePhase>("idle");
+  const { showToast } = useToast();
 
   function handleStartTalking() {
     document.getElementById("voice-assistant")?.scrollIntoView({ behavior: "smooth" });
@@ -23,6 +28,11 @@ export default function HomePage() {
 
   function handleRunJudgeDemo() {
     void assistantRef.current?.runJudgeDemo();
+  }
+
+  function handleDismissJudgeGuide() {
+    setJudgeGuidePhase("done");
+    showToast("Continue to checkout when ready", "info");
   }
 
   const products = getAllProducts();
@@ -34,11 +44,14 @@ export default function HomePage() {
         onRunJudgeDemo={handleRunJudgeDemo}
       />
       <DemoFlowSteps />
-      <div className="max-w-6xl mx-auto px-4 flex justify-center -mt-4 mb-2">
-        <JudgeModeButton onRun={handleRunJudgeDemo} />
-      </div>
-      <VoiceAssistant ref={assistantRef} id="voice-assistant" />
+      <VoiceAssistant
+        ref={assistantRef}
+        id="voice-assistant"
+        onJudgeGuidePhase={setJudgeGuidePhase}
+      />
+      <JudgeDemoGuide phase={judgeGuidePhase} onDismiss={handleDismissJudgeGuide} />
       <LiveSalesPanel />
+      <VoiceCommerceAnalytics />
       <section className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-slate-100 mb-2">Digital products</h2>
         <p className="text-slate-400 mb-8">

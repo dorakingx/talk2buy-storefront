@@ -5,6 +5,7 @@ import {
   recentPurchases,
   generatedAudioLog,
 } from "@/lib/mock-data";
+import { ConversionFunnelViz } from "./ConversionFunnelViz";
 import { RevenueChart } from "./RevenueChart";
 
 export function CreatorDashboard() {
@@ -65,6 +66,8 @@ export function CreatorDashboard() {
           <MetricCard label="Conv. lift" value={funnelMetrics.estimatedConversionLift} />
         </div>
       </div>
+
+      <ConversionFunnelViz />
 
       <div className="mb-8">
         <RevenueChart />

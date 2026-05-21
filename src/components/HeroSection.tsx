@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HeroRevenuePipeline } from "./HeroRevenuePipeline";
 import { JudgeModeButton } from "./JudgeModeButton";
 
 interface HeroSectionProps {
@@ -10,8 +11,8 @@ interface HeroSectionProps {
 
 export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps) {
   return (
-    <section className="gradient-hero py-20 md:py-28 px-4">
-      <div className="max-w-4xl mx-auto text-center animate-fade-in">
+    <section id="hero" className="gradient-hero py-20 md:py-28 px-4 scroll-mt-20">
+      <div className="max-w-5xl mx-auto text-center animate-fade-in">
         <p className="text-cyan-400 text-sm font-medium tracking-wider uppercase mb-4">
           ElevenLabs x Stripe Hackathon · Talk2Buy
         </p>
@@ -42,6 +43,20 @@ export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps
           </Link>
           {onRunJudgeDemo && <JudgeModeButton onRun={onRunJudgeDemo} />}
         </div>
+        <HeroRevenuePipeline />
+        {onRunJudgeDemo && (
+          <p className="mt-4 text-sm text-slate-500">
+            Judges:{" "}
+            <button
+              type="button"
+              onClick={onRunJudgeDemo}
+              className="text-fuchsia-400/90 hover:text-fuchsia-300 underline-offset-2 hover:underline"
+            >
+              run the guided demo
+            </button>{" "}
+            from the pipeline above
+          </p>
+        )}
       </div>
     </section>
   );

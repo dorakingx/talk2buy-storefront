@@ -28,6 +28,9 @@ export interface AssistantResponse {
   whyItFits?: string;
   whatYouGet?: string;
   cta?: string;
+  matchScore?: number;
+  matchSignals?: string[];
+  expectedOutcome?: string;
 }
 
 export interface StripeSessionResponse {

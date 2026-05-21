@@ -12,7 +12,10 @@ export interface DemoContext {
   whatYouGet?: string;
   cta?: string;
   matchScore?: number;
+  matchSignals?: string[];
+  expectedOutcome?: string;
   customerName?: string;
+  voicePreviewPlayed?: boolean;
   demoStep?: DemoStep;
 }
 

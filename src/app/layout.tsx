@@ -14,10 +14,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const title = "Talk2Buy Storefront";
+const description =
+  "An AI voice storefront that turns conversations into Stripe-powered sales.";
+
 export const metadata: Metadata = {
-  title: "Talk-to-Buy Storefront",
-  description:
-    "AI voice storefront — talk with an AI shop assistant, buy digital products, and receive personalized voice messages.",
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({

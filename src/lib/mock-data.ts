@@ -73,6 +73,26 @@ export const recentPurchases = [
   },
 ];
 
+export const voiceCommerceAnalytics = {
+  voicePreviewPlays: 48,
+  checkoutStarts: 21,
+  purchasesCompleted: 13,
+  estimatedConversionLift: "+18%",
+  revenueInfluencedByVoice: 89400,
+};
+
+export const conversionFunnel = [
+  { label: "Visitors", count: 128 },
+  { label: "Voice conversations", count: 74 },
+  { label: "Recommendations", count: 52 },
+  { label: "Voice preview plays", count: 48 },
+  { label: "Checkout starts", count: 21 },
+  { label: "Purchases", count: 13 },
+];
+
+export const funnelInsight =
+  "Products with voice previews converted 2.1x better than static product cards in this demo scenario.";
+
 export const generatedAudioLog = [
   {
     id: "a1",

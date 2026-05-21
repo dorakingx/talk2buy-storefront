@@ -131,6 +131,21 @@ body {
   animation: fade-in 0.5s ease-out forwards;
 }
 
+@keyframes pipeline-glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(34, 211, 238, 0); }
+  50% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); }
+}
+
+.pipeline-step {
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.pipeline-step-active {
+  animation: fade-in 0.5s ease-out forwards, pipeline-glow 2.5s ease-in-out infinite;
+  opacity: 1;
+}
+
 .rec-card-highlight {
   background: linear-gradient(
     135deg,

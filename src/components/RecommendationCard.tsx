@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getProductById, formatPrice } from "@/lib/products";
-import { loadDemoContext } from "@/lib/demo-storage";
+import { loadDemoContext, saveDemoContext } from "@/lib/demo-storage";
 import { buildPersonalizedPreview } from "@/lib/voice-scripts";
 import { playVoiceText, isVoicePlaying } from "@/lib/voice-client";
 import { setDemoStep } from "@/lib/demo-storage";
@@ -16,9 +16,12 @@ interface RecommendationCardProps {
   whatYouGet?: string;
   cta?: string;
   matchScore?: number;
+  matchSignals?: string[];
+  expectedOutcome?: string;
   userIntent?: string;
   highlight?: boolean;
   onVoiceStateChange?: (state: VoiceOrbState) => void;
+  onSampleEnded?: () => void;
 }
 
 export function RecommendationCard({
@@ -27,9 +30,12 @@ export function RecommendationCard({
   whatYouGet,
   cta,
   matchScore = 94,
+  matchSignals = [],
+  expectedOutcome,
   userIntent,
   highlight = false,
   onVoiceStateChange,
+  onSampleEnded,
 }: RecommendationCardProps) {
   const product = getProductById(productId);
   const [sampleLoading, setSampleLoading] = useState(false);
@@ -39,6 +45,8 @@ export function RecommendationCard({
 
   const ctx = loadDemoContext();
   const intent = userIntent ?? ctx?.userIntent ?? "";
+  const outcome = expectedOutcome ?? ctx?.expectedOutcome ?? product.whatYouGet;
+  const signals = matchSignals.length > 0 ? matchSignals : ctx?.matchSignals ?? [];
 
   async function handleHearSample() {
     if (isVoicePlaying() || sampleLoading) return;
@@ -59,11 +67,17 @@ export function RecommendationCard({
     try {
       const result = await playVoiceText(previewText, {
         onStart: () => onVoiceStateChange?.("speaking"),
-        onEnd: () => onVoiceStateChange?.("idle"),
+        onEnd: () => {
+          onVoiceStateChange?.("idle");
+          saveDemoContext({ voicePreviewPlayed: true });
+          onSampleEnded?.();
+        },
         onError: (msg) => showToast(msg, "info"),
       });
       if (result.demo && result.usedBrowserFallback) {
         showToast("Demo voice mode (browser)", "info");
+        saveDemoContext({ voicePreviewPlayed: true });
+        onSampleEnded?.();
       }
     } finally {
       setSampleLoading(false);
@@ -73,6 +87,7 @@ export function RecommendationCard({
 
   return (
     <div
+      id="recommendation-card"
       className={`mx-4 mb-4 rec-card-highlight rounded-2xl p-5 md:p-6 transition-all ${
         highlight ? "ring-2 ring-cyan-400/50 animate-pulse" : ""
       }`}
@@ -93,48 +108,63 @@ export function RecommendationCard({
         </span>
       </div>
 
+      {signals.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3 mb-2">
+          {signals.map((s) => (
+            <span
+              key={s}
+              className="text-[10px] px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-200/90 border border-cyan-500/20"
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      )}
+
       <p className="text-cyan-400 font-semibold">{formatPrice(product.price, product.currency)}</p>
       <p className="text-sm text-slate-300 mt-2">{product.shortBenefit}</p>
 
-      <ul className="mt-4 space-y-3 text-sm">
-        {whyItFits && (
-          <li className="flex gap-2 text-slate-400">
-            <span className="text-cyan-400 shrink-0">→</span>
-            <span>
-              <span className="text-slate-200 font-medium">Why this fits: </span>
-              {whyItFits}
-            </span>
-          </li>
-        )}
-        {whatYouGet && (
-          <li className="flex gap-2 text-slate-400">
-            <span className="text-violet-400 shrink-0">→</span>
-            <span>
-              <span className="text-slate-200 font-medium">What you get: </span>
-              {whatYouGet}
-            </span>
-          </li>
-        )}
-        {cta && (
-          <li className="flex gap-2 text-slate-400">
-            <span className="text-fuchsia-400 shrink-0">→</span>
-            <span>
-              <span className="text-slate-200 font-medium">Best next step: </span>
-              {cta}
-            </span>
-          </li>
-        )}
-      </ul>
+      <details className="mt-4 group">
+        <summary className="text-sm text-violet-300 cursor-pointer hover:text-violet-200 list-none flex items-center gap-2">
+          <span className="group-open:rotate-90 transition-transform">▸</span>
+          Why this recommendation?
+        </summary>
+        <div className="mt-3 space-y-3 text-sm pl-4 border-l border-violet-500/20">
+          <div>
+            <p className="text-slate-300 font-medium">Matched user intent</p>
+            <p className="text-slate-400">{intent || "General discovery"}</p>
+          </div>
+          {whyItFits && (
+            <div>
+              <p className="text-slate-300 font-medium">Product fit</p>
+              <p className="text-slate-400">{whyItFits}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-slate-300 font-medium">Expected outcome</p>
+            <p className="text-slate-400">{outcome}</p>
+          </div>
+          {cta && (
+            <div>
+              <p className="text-slate-300 font-medium">Best next action</p>
+              <p className="text-slate-400">{cta}</p>
+            </div>
+          )}
+        </div>
+      </details>
 
       <div className="flex flex-wrap gap-3 mt-6">
-        <CheckoutButton
-          productId={productId}
-          label="Buy with Stripe"
-          showStripeBadge
-          onCheckoutStart={() => setDemoStep("pay")}
-        />
+        <div data-judge-target="checkout">
+          <CheckoutButton
+            productId={productId}
+            label="Buy with Stripe"
+            showStripeBadge
+            onCheckoutStart={() => setDemoStep("pay")}
+          />
+        </div>
         <button
           type="button"
+          data-judge-target="hear-sample"
           onClick={handleHearSample}
           disabled={sampleLoading}
           className="rounded-xl px-4 py-2 text-sm border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10 transition-colors disabled:opacity-50"

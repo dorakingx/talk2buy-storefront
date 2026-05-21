@@ -14,7 +14,10 @@ export function ConversationFunnel() {
         From conversation to revenue
       </h2>
       <p className="text-slate-500 text-center text-sm mb-10 max-w-xl mx-auto">
-        A voice-first funnel that connects ElevenLabs engagement with Stripe revenue.
+        Full funnel detail — see the hero pipeline for the quick view.{" "}
+        <a href="#hero" className="text-cyan-400/80 hover:text-cyan-300">
+          Back to top
+        </a>
       </p>
       <div className="glass-card rounded-2xl p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

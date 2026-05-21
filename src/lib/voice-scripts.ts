@@ -2,15 +2,8 @@ import { getProductById } from "@/lib/products";
 import type { Product } from "@/types";
 import type { DemoContext } from "@/lib/demo-storage";
 
-export function computeMatchScore(productId: string, userIntent: string): number {
-  let hash = 0;
-  const str = `${productId}:${userIntent.toLowerCase().trim()}`;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return 88 + (Math.abs(hash) % 10);
-}
+export { computeMatchScore, computeMatchAnalysis, getExpectedOutcome } from "@/lib/match-score";
+export type { MatchAnalysis } from "@/lib/match-score";
 
 export function buildPersonalizedPreview(ctx: DemoContext): string {
   const product = ctx.recommendedProductId

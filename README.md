@@ -1,5 +1,7 @@
 # Talk2Buy Storefront
 
+Built with **ElevenLabs** · Powered by **Stripe** · **Demo mode** available
+
 **Voice is not just content. Voice is the sales interface.**
 
 Talk2Buy is a voice-first commerce platform for digital creators. Visitors talk with an AI sales assistant, hear personalized ElevenLabs previews, pay through Stripe, and receive a spoken thank-you tied to their original intent.
@@ -47,7 +49,15 @@ An AI voice storefront where:
 | Pay with Stripe | Checkout or demo redirect |
 | Personal audio | Thank-you on success page |
 
-**Judge tip:** Click **Run 30-sec demo** on the hero for an automated walkthrough.
+## Winning demo path (judges)
+
+1. Open the hero — note the **Conversation → Revenue** pipeline (ElevenLabs + Stripe steps).
+2. Click **Run judge demo** — guided overlay points to **Hear sample**, then **Buy with Stripe**.
+3. Watch match score + “Why this recommendation?” signals on the recommendation card.
+4. Complete demo checkout → success page **experience loop** + personalized thank-you audio.
+5. Open **Creator dashboard** — conversion funnel and voice commerce analytics.
+
+See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) and [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) before recording.
 
 ## Quick start
 
@@ -113,6 +123,18 @@ src/
 | `npm run dev` | Development server |
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
+
+## Screenshots
+
+Add captures under `docs/screenshots/` for your submission README:
+
+| File | Capture |
+|------|---------|
+| `docs/screenshots/hero.png` | Hero with revenue pipeline + Run judge demo |
+| `docs/screenshots/assistant.png` | Recommendation card with match signals and Hear sample |
+| `docs/screenshots/analytics.png` | Voice commerce analytics section |
+| `docs/screenshots/dashboard.png` | Creator dashboard conversion funnel |
+| `docs/screenshots/success.png` | Success page experience loop + thank-you audio |
 
 ## Demo video
 

@@ -1,4 +1,5 @@
 import { getProductById, QUICK_REPLIES } from "@/lib/products";
+import { computeMatchAnalysis } from "@/lib/match-score";
 import type { AssistantResponse } from "@/types";
 
 const KEYWORD_RULES: { keywords: string[]; productId: string }[] = [
@@ -24,7 +25,7 @@ function matchProductId(message: string): string {
   return "quantum-audio-guide";
 }
 
-function buildStructuredReply(productId: string, userInterest?: string): AssistantResponse {
+function buildStructuredReply(productId: string, message: string): AssistantResponse {
   const product = getProductById(productId);
   if (!product) {
     return {
@@ -33,11 +34,12 @@ function buildStructuredReply(productId: string, userInterest?: string): Assista
     };
   }
 
-  const interest = userInterest ?? "what you're looking for";
+  const interest = extractInterest(message, productId);
   const whyItFits = `Based on your interest in ${interest}, this is the best match for your goals right now.`;
   const whatYouGet = product.whatYouGet;
   const cta = "Would you like to unlock it now?";
   const reply = `Based on your interest in ${interest}, I recommend the ${product.name}. You'll get ${whatYouGet} ${cta}`;
+  const match = computeMatchAnalysis(productId, message);
 
   return {
     reply,
@@ -45,6 +47,9 @@ function buildStructuredReply(productId: string, userInterest?: string): Assista
     whyItFits,
     whatYouGet,
     cta,
+    matchScore: match.score,
+    matchSignals: match.signals,
+    expectedOutcome: match.expectedOutcome,
   };
 }
 
@@ -60,12 +65,11 @@ function extractInterest(message: string, productId: string): string {
 
 export async function getAssistantReply(message: string): Promise<AssistantResponse> {
   const productId = matchProductId(message);
-  const interest = extractInterest(message, productId);
 
   if (process.env.OPENAI_API_KEY) {
     try {
       const product = getProductById(productId);
-      const structured = buildStructuredReply(productId, interest);
+      const structured = buildStructuredReply(productId, message);
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -88,12 +92,16 @@ export async function getAssistantReply(message: string): Promise<AssistantRespo
         const data = await res.json();
         const reply = data.choices?.[0]?.message?.content?.trim();
         if (reply) {
+          const match = computeMatchAnalysis(productId, message);
           return {
             reply,
             recommendedProductId: productId,
             whyItFits: structured.whyItFits,
             whatYouGet: structured.whatYouGet,
             cta: structured.cta,
+            matchScore: match.score,
+            matchSignals: match.signals,
+            expectedOutcome: match.expectedOutcome,
           };
         }
       }
@@ -102,7 +110,7 @@ export async function getAssistantReply(message: string): Promise<AssistantRespo
     }
   }
 
-  return buildStructuredReply(productId, interest);
+  return buildStructuredReply(productId, message);
 }
 
 export function getGreeting(): string {

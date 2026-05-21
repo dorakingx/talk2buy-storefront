@@ -10,7 +10,6 @@ import {
 } from "react";
 import { getGreeting } from "@/lib/assistant";
 import { saveDemoContext, setDemoStep, clearDemoContext } from "@/lib/demo-storage";
-import { computeMatchScore } from "@/lib/voice-scripts";
 import { playVoiceText, stopAllVoice } from "@/lib/voice-client";
 import type { AssistantResponse, ChatMessage, VoiceOrbState } from "@/types";
 import { ChatBubble } from "./ChatBubble";
@@ -21,16 +20,19 @@ import { useToast } from "./Toast";
 
 const JUDGE_DEMO_MESSAGE = "I want to learn quantum computing";
 
+export type JudgeGuidePhase = "idle" | "awaiting_sample" | "awaiting_checkout" | "done";
+
 export interface VoiceAssistantHandle {
   runJudgeDemo: () => Promise<void>;
 }
 
 interface VoiceAssistantProps {
   id?: string;
+  onJudgeGuidePhase?: (phase: JudgeGuidePhase) => void;
 }
 
 export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantProps>(
-  function VoiceAssistant({ id = "voice-assistant" }, ref) {
+  function VoiceAssistant({ id = "voice-assistant", onJudgeGuidePhase }, ref) {
     const [messages, setMessages] = useState<ChatMessage[]>(() => [
       { id: "0", role: "assistant", content: getGreeting() },
     ]);
@@ -43,6 +45,8 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
     const [userIntent, setUserIntent] = useState("");
     const [cardHighlight, setCardHighlight] = useState(false);
     const [matchScore, setMatchScore] = useState(94);
+    const [matchSignals, setMatchSignals] = useState<string[]>([]);
+    const [expectedOutcome, setExpectedOutcome] = useState<string | undefined>();
 
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const pttTranscriptRef = useRef("");
@@ -91,10 +95,6 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
           const data = (await res.json()) as AssistantResponse;
           if (!res.ok) throw new Error("Assistant error");
 
-          const score = data.recommendedProductId
-            ? computeMatchScore(data.recommendedProductId, text.trim())
-            : undefined;
-
           const assistantMsg: ChatMessage = {
             id: (Date.now() + 1).toString(),
             role: "assistant",
@@ -109,7 +109,9 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
 
           if (data.recommendedProductId) {
             setRecommendation(data);
-            setMatchScore(score ?? 94);
+            setMatchScore(data.matchScore ?? 94);
+            setMatchSignals(data.matchSignals ?? []);
+            setExpectedOutcome(data.expectedOutcome);
             setDemoStep("recommend");
             saveDemoContext({
               userIntent: text.trim(),
@@ -117,8 +119,11 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
               whyItFits: data.whyItFits,
               whatYouGet: data.whatYouGet,
               cta: data.cta,
-              matchScore: score,
+              matchScore: data.matchScore,
+              matchSignals: data.matchSignals,
+              expectedOutcome: data.expectedOutcome,
             });
+            onJudgeGuidePhase?.("awaiting_sample");
           }
 
           await speak(data.reply);
@@ -136,7 +141,7 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
           setLoading(false);
         }
       },
-      [loading, speak]
+      [loading, speak, onJudgeGuidePhase]
     );
 
     useImperativeHandle(ref, () => ({
@@ -144,10 +149,10 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
         clearDemoContext();
         setRecommendation(null);
         setCardHighlight(false);
+        onJudgeGuidePhase?.("idle");
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
         await sendMessage(JUDGE_DEMO_MESSAGE);
         setCardHighlight(true);
-        showToast("Demo running — tap Hear sample or checkout", "success");
         setTimeout(() => setCardHighlight(false), 3000);
       },
     }));
@@ -251,18 +256,21 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
             )}
           </div>
 
-          {recommendation?.recommendedProductId && (
-            <RecommendationCard
-              productId={recommendation.recommendedProductId}
-              whyItFits={recommendation.whyItFits}
-              whatYouGet={recommendation.whatYouGet}
-              cta={recommendation.cta}
-              matchScore={matchScore}
-              userIntent={userIntent}
-              highlight={cardHighlight}
-              onVoiceStateChange={setOrbState}
-            />
-          )}
+        {recommendation?.recommendedProductId && (
+          <RecommendationCard
+            productId={recommendation.recommendedProductId}
+            whyItFits={recommendation.whyItFits}
+            whatYouGet={recommendation.whatYouGet}
+            cta={recommendation.cta}
+            matchScore={matchScore}
+            matchSignals={matchSignals}
+            expectedOutcome={expectedOutcome}
+            userIntent={userIntent}
+            highlight={cardHighlight}
+            onVoiceStateChange={setOrbState}
+            onSampleEnded={() => onJudgeGuidePhase?.("awaiting_checkout")}
+          />
+        )}
 
           <div className="p-4 border-t border-cyan-500/10">
             <p className="text-xs text-slate-500 mb-2 text-center">Text fallback</p>

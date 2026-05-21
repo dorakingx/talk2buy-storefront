@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { ExperienceLoop } from "@/components/ExperienceLoop";
 import { useToast } from "@/components/Toast";
 import { getProductById, formatPrice } from "@/lib/products";
 import { loadDemoContext, setDemoStep, saveDemoContext } from "@/lib/demo-storage";
@@ -78,6 +79,9 @@ function SuccessContent() {
       whatYouGet: stored?.whatYouGet,
       cta: stored?.cta,
       matchScore: stored?.matchScore,
+      matchSignals: stored?.matchSignals,
+      expectedOutcome: stored?.expectedOutcome,
+      voicePreviewPlayed: stored?.voicePreviewPlayed,
       customerName: session?.customerName ?? undefined,
     };
   }, [queryIntent, session]);
@@ -168,6 +172,11 @@ function SuccessContent() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 relative overflow-hidden">
       <div className="confetti pointer-events-none absolute inset-0" aria-hidden />
+      <ExperienceLoop
+        ctx={demoCtx}
+        productName={product?.name}
+        thankYouGenerated={!!thankYouText && !voiceLoading}
+      />
       <div className="glass-card rounded-2xl p-8 text-center relative z-10">
         <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400/50 flex items-center justify-center mx-auto mb-6 animate-fade-in">
           <span className="text-3xl text-emerald-400">✓</span>
