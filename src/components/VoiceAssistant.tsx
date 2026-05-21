@@ -17,6 +17,7 @@ import { QuickReplies } from "./QuickReplies";
 import { RecommendationCard } from "./RecommendationCard";
 import { VoiceOrb } from "./VoiceOrb";
 import { useToast } from "./Toast";
+import { useRecordingMode } from "@/hooks/useRecordingMode";
 
 const JUDGE_DEMO_MESSAGE = "I want to learn quantum computing";
 
@@ -52,6 +53,15 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
     const pttTranscriptRef = useRef("");
     const introSpokenRef = useRef(false);
     const { showToast } = useToast();
+    const recordingMode = useRecordingMode();
+    const [pttSupported, setPttSupported] = useState(true);
+
+    useEffect(() => {
+      const SpeechRecognition =
+        typeof window !== "undefined" &&
+        (window.SpeechRecognition || window.webkitSpeechRecognition);
+      setPttSupported(!!SpeechRecognition);
+    }, []);
 
     const speak = useCallback(async (text: string) => {
       await playVoiceText(text, {
@@ -62,10 +72,10 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
     }, [showToast]);
 
     useEffect(() => {
-      if (introSpokenRef.current) return;
+      if (introSpokenRef.current || recordingMode) return;
       introSpokenRef.current = true;
       void speak(getGreeting());
-    }, [speak]);
+    }, [speak, recordingMode]);
 
     const sendMessage = useCallback(
       async (text: string) => {
@@ -160,7 +170,9 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
         await sendMessage(JUDGE_DEMO_MESSAGE);
         setCardHighlight(true);
-        setTimeout(() => setCardHighlight(false), 3000);
+        if (!recordingMode) {
+          setTimeout(() => setCardHighlight(false), 3000);
+        }
       },
     }));
 
@@ -170,20 +182,15 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
     }
 
     function startPTT() {
-      const SpeechRecognition =
-        typeof window !== "undefined" &&
-        (window.SpeechRecognition || window.webkitSpeechRecognition);
-      if (!SpeechRecognition) {
-        showToast(
-          "Push-to-talk is not supported in this browser — use quick replies or type your message.",
-          "info"
-        );
-        return;
-      }
+      if (!pttSupported) return;
+
+      const SpeechRecognitionCtor =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionCtor) return;
 
       stopAllVoice();
       pttTranscriptRef.current = "";
-      const recognition = new SpeechRecognition();
+      const recognition = new SpeechRecognitionCtor();
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = "en-US";
@@ -246,13 +253,14 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
             onSelect={(msg) => sendMessage(msg)}
           />
 
-          <div className="flex flex-wrap justify-center gap-3 px-4 pb-4">
+          <div className="flex flex-col items-center gap-2 px-4 pb-4">
+          <div className="flex flex-wrap justify-center gap-3">
             <button
               type="button"
               onPointerDown={startPTT}
               onPointerUp={endPTT}
               onPointerLeave={endPTT}
-              disabled={loading}
+              disabled={loading || !pttSupported}
               className="select-none rounded-2xl px-8 py-4 text-sm font-semibold bg-gradient-to-r from-cyan-500/20 to-violet-500/20 border-2 border-cyan-400/50 text-cyan-300 hover:border-cyan-400 active:scale-95 transition-all disabled:opacity-50"
             >
               {orbState === "listening" ? "Release to send" : "Push to Talk"}
@@ -267,6 +275,12 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
                 Replay assistant voice
               </button>
             )}
+          </div>
+          {!pttSupported && (
+            <p className="text-xs text-slate-500 text-center max-w-md px-2">
+              Voice input unavailable in this browser — use quick replies or text input
+            </p>
+          )}
           </div>
 
         {recommendation?.recommendedProductId && (

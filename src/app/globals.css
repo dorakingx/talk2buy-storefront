@@ -146,6 +146,19 @@ body {
   opacity: 1;
 }
 
+.recording-mode .animate-pulse,
+.recording-mode .pipeline-step-active {
+  animation: none !important;
+}
+
+.recording-mode .animate-fade-in {
+  animation-duration: 0.2s;
+}
+
+.recording-mode .rec-card-highlight.animate-pulse {
+  animation: none !important;
+}
+
 .rec-card-highlight {
   background: linear-gradient(
     135deg,

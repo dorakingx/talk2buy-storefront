@@ -8,6 +8,7 @@ import { playVoiceText, isVoicePlaying } from "@/lib/voice-client";
 import { setDemoStep } from "@/lib/demo-storage";
 import { CheckoutButton } from "./CheckoutButton";
 import { useToast } from "./Toast";
+import { useRecordingMode } from "@/hooks/useRecordingMode";
 import type { VoiceOrbState } from "@/types";
 
 interface RecommendationCardProps {
@@ -40,6 +41,7 @@ export function RecommendationCard({
   const product = getProductById(productId);
   const [sampleLoading, setSampleLoading] = useState(false);
   const { showToast } = useToast();
+  const recordingMode = useRecordingMode();
 
   if (!product) return null;
 
@@ -84,7 +86,9 @@ export function RecommendationCard({
     <div
       id="recommendation-card"
       className={`mx-4 mb-4 rec-card-highlight rounded-2xl p-5 md:p-6 transition-all ${
-        highlight ? "ring-2 ring-cyan-400/50 animate-pulse" : ""
+        highlight
+          ? `ring-2 ring-cyan-400/50 ${recordingMode ? "" : "animate-pulse"}`
+          : ""
       }`}
     >
       <div className="flex flex-wrap items-center gap-2 mb-3">

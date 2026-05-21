@@ -38,9 +38,17 @@ Copy `.env.example` to `.env.local` and set as needed:
 ## Judge demo recording
 
 - [ ] Hero pipeline visible above the fold on desktop
-- [ ] Judge overlay highlights **Hear sample** then **Buy with Stripe**
+- [ ] Header shows Demo mode or Live mode pill (`/api/config`)
+- [ ] Judge overlay highlights **Hear sample** then **Buy with Stripe** (buttons remain clickable)
 - [ ] Creator dashboard shows conversion funnel and demo insight
-- [ ] Record 60–90s using [DEMO_SCRIPT.md](DEMO_SCRIPT.md)
+- [ ] Record 60–90s using [DEMO_SCRIPT.md](DEMO_SCRIPT.md) — optional `/?recording=1`
+
+## Pre-submission
+
+- [ ] Replace `YOUR-APP.vercel.app` in README and HACKATHON_SUBMISSION with real deploy URL
+- [ ] Add demo video link (no `TBD` in submission docs)
+- [ ] Screenshots committed under `docs/screenshots/`
+- [ ] GitHub repo is public
 
 ## Deploy (Vercel)
 

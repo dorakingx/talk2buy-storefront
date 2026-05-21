@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { AppModePill } from "@/components/AppModePill";
 import { Providers } from "@/components/Providers";
+import { RecordingModeBanner } from "@/components/RecordingModeBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,9 +52,9 @@ export default function RootLayout({
         <header className="border-b border-cyan-500/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-lg font-semibold text-gradient">
-              Talk-to-Buy
+              Talk2Buy
             </Link>
-            <nav className="flex gap-6 text-sm text-slate-400">
+            <nav className="flex flex-wrap items-center gap-3 md:gap-6 text-sm text-slate-400">
               <Link href="/" className="hover:text-cyan-400 transition-colors">
                 Store
               </Link>
@@ -62,14 +64,16 @@ export default function RootLayout({
               >
                 Dashboard
               </Link>
+              <AppModePill />
             </nav>
           </div>
         </header>
+        <RecordingModeBanner />
         <main className="flex-1">
           <Providers>{children}</Providers>
         </main>
         <footer className="border-t border-cyan-500/10 py-6 text-center text-sm text-slate-500">
-          Voice is not just content anymore. It is a sales interface.
+          Voice is not just content. Voice is the sales interface.
         </footer>
       </body>
     </html>

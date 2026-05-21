@@ -1,8 +1,6 @@
 # Talk2Buy Storefront — Hackathon Submission
 
-## Project title
-
-**Talk2Buy Storefront**
+**Talk2Buy turns voice conversations into revenue.**
 
 ## One-sentence pitch
 
@@ -10,47 +8,49 @@ Turn live voice conversations into personalized product recommendations, ElevenL
 
 ## Problem
 
-Digital creators lose sales on static product pages. Visitors cannot hear why a product fits them, and text-only chat feels like support — not sales.
+Creators lose sales on static product pages. Visitors cannot hear why a product fits them; text-only chat feels like support, not sales.
 
 ## Solution
 
-An AI voice storefront where visitors talk (push-to-talk or quick replies), receive a scored recommendation with explainable signals, hear a personalized ElevenLabs preview, pay via Stripe, and get thank-you audio tied to their original intent.
+AI voice storefront: talk → scored recommendation → ElevenLabs preview → Stripe checkout → personalized thank-you audio from the same conversation context.
 
-## How ElevenLabs is used
+## ElevenLabs
 
-- Assistant replies spoken after recommendations
-- **Hear sample** — personalized preview from conversation context (not generic product copy)
-- Post-purchase thank-you audio on the success page
-- Graceful browser-voice fallback when API keys are missing
+- Spoken assistant replies
+- **Hear sample** from visitor intent (not generic copy)
+- Post-purchase thank-you on success page
+- Browser voice fallback when keys are missing
 
-## How Stripe is used
+## Stripe
 
-- Stripe Checkout when `STRIPE_SECRET_KEY` is configured
-- Session metadata: product, customer name, user intent
-- **Demo checkout** when Stripe is not configured — full success-page loop still works
+- Checkout Sessions with metadata: `productId`, `customerName`, `userIntent`
+- Demo checkout when Stripe is not configured
 
 ## Why it is original
 
-Voice is the **sales interface**, not a post-purchase perk. The same conversation thread drives recommendation, preview, payment, and delivery — measurable as a conversation-to-revenue pipeline (ElevenLabs engagement → Stripe conversion).
+Voice is the **sales interface**. One thread drives recommendation, preview, payment, and delivery — a measurable conversation-to-revenue pipeline.
 
 ## Demo flow
 
-1. Land on hero — see Conversation → Revenue pipeline (ElevenLabs + Stripe)
-2. Click **Run judge demo** — guided overlay: Hear sample → Buy with Stripe
-3. Review match score and “Why this recommendation?”
-4. Complete demo or real checkout
-5. Success page — **Your conversation became a product experience**
-6. Creator dashboard — voice commerce analytics and conversion funnel (demo data)
+1. Hero pipeline (ElevenLabs + Stripe badges)
+2. **Run judge demo** → Hear sample → Buy with Stripe
+3. Match score + explanation expander
+4. Checkout → success experience loop
+5. Dashboard funnel (demo analytics)
+
+Record with `?recording=1` for stable layout.
 
 ## Links
 
 | Resource | URL |
 |----------|-----|
 | GitHub | https://github.com/dorakingx/talk2buy-storefront |
-| Live demo | TBD |
-| Demo video | TBD |
+| Live demo | Deploy to Vercel — set `NEXT_PUBLIC_APP_URL` to `https://YOUR-APP.vercel.app` |
+| Demo video | Add YouTube/Loom link after recording |
 
-## Before you record
+## Before submit
 
 - [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)
 - [DEMO_SCRIPT.md](DEMO_SCRIPT.md)
+
+Replace `YOUR-APP` and video `TBD` before final submission.
