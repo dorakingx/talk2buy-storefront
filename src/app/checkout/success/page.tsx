@@ -5,8 +5,11 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { useToast } from "@/components/Toast";
-import { getProductById, getThankYouMessage, formatPrice } from "@/lib/products";
+import { getProductById, formatPrice } from "@/lib/products";
+import { loadDemoContext, setDemoStep, saveDemoContext } from "@/lib/demo-storage";
+import { buildPersonalizedThankYou } from "@/lib/voice-scripts";
 import { playVoiceText } from "@/lib/voice-client";
+import type { DemoContext } from "@/lib/demo-storage";
 import type { StripeSessionResponse } from "@/types";
 
 function SuccessContent() {
@@ -15,6 +18,7 @@ function SuccessContent() {
   const isDemo = searchParams.get("demo") === "1";
   const demoProductId = searchParams.get("productId");
   const demoCustomerName = searchParams.get("customerName") ?? "Guest";
+  const queryIntent = searchParams.get("userIntent");
 
   const [stripeSession, setStripeSession] = useState<StripeSessionResponse | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -23,6 +27,10 @@ function SuccessContent() {
   const [voiceLoading, setVoiceLoading] = useState(false);
   const [replayLoading, setReplayLoading] = useState(false);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setDemoStep("thank_you");
+  }, []);
 
   const demoSession = useMemo((): StripeSessionResponse | null => {
     if (!isDemo || !demoProductId) return null;
@@ -34,8 +42,9 @@ function SuccessContent() {
       productId: demoProductId,
       productName: p.name,
       paymentStatus: "paid",
+      userIntent: queryIntent ? decodeURIComponent(queryIntent) : null,
     };
-  }, [isDemo, demoProductId, demoCustomerName]);
+  }, [isDemo, demoProductId, demoCustomerName, queryIntent]);
 
   const session = isDemo ? demoSession : stripeSession;
 
@@ -53,10 +62,30 @@ function SuccessContent() {
     session?.productId != null ? getProductById(session.productId) : undefined;
 
   const customerName = session?.customerName ?? "there";
-  const productName = product?.name ?? session?.productName;
-  const thankYouText = product
-    ? getThankYouMessage(customerName, product)
-    : null;
+
+  const demoCtx = useMemo((): DemoContext | null => {
+    const stored = loadDemoContext();
+    const intent =
+      (queryIntent ? decodeURIComponent(queryIntent) : null) ??
+      session?.userIntent ??
+      stored?.userIntent ??
+      "";
+    if (!intent && !stored) return stored;
+    return {
+      userIntent: intent,
+      recommendedProductId: session?.productId ?? stored?.recommendedProductId,
+      whyItFits: stored?.whyItFits,
+      whatYouGet: stored?.whatYouGet,
+      cta: stored?.cta,
+      matchScore: stored?.matchScore,
+      customerName: session?.customerName ?? undefined,
+    };
+  }, [queryIntent, session]);
+
+  const thankYouText =
+    product && customerName
+      ? buildPersonalizedThankYou(customerName, product, demoCtx)
+      : null;
 
   useEffect(() => {
     if (isDemo || !sessionId) return;
@@ -66,6 +95,13 @@ function SuccessContent() {
       .then(({ ok, data }) => {
         if (!ok) throw new Error(data.error ?? "Failed to load session");
         setStripeSession(data);
+        if (data.userIntent || data.productId) {
+          saveDemoContext({
+            userIntent: data.userIntent ?? loadDemoContext()?.userIntent ?? "",
+            recommendedProductId: data.productId ?? undefined,
+            customerName: data.customerName ?? undefined,
+          });
+        }
       })
       .catch((e) => {
         setFetchError(e instanceof Error ? e.message : "Failed to load session");
@@ -76,21 +112,20 @@ function SuccessContent() {
     if (!thankYouText) return;
 
     let active = true;
-
     const message = thankYouText;
+
     async function run() {
       setVoiceLoading(true);
       setAudioUrl(null);
       setDemoMode(false);
-      const result = await playVoiceText(message);
+      const result = await playVoiceText(message, {
+        onError: (msg) => showToast(msg, "info"),
+      });
       if (!active) return;
       if (result.url) {
         setAudioUrl(result.url);
       } else if (result.demo) {
         setDemoMode(true);
-        if (typeof window !== "undefined" && window.speechSynthesis) {
-          window.speechSynthesis.speak(new SpeechSynthesisUtterance(message));
-        }
       }
       setVoiceLoading(false);
     }
@@ -99,13 +134,15 @@ function SuccessContent() {
     return () => {
       active = false;
     };
-  }, [thankYouText]);
+  }, [thankYouText, showToast]);
 
   async function handleReplay() {
     if (!thankYouText) return;
     setReplayLoading(true);
     setVoiceLoading(true);
-    const result = await playVoiceText(thankYouText);
+    const result = await playVoiceText(thankYouText, {
+      onError: (msg) => showToast(msg, "info"),
+    });
     if (result.url) setAudioUrl(result.url);
     else if (result.demo) setDemoMode(true);
     setVoiceLoading(false);
@@ -142,15 +179,13 @@ function SuccessContent() {
           </span>
         )}
 
-        {productName ? (
+        {product ? (
           <>
-            <p className="text-xl text-slate-200 font-medium mt-4">{productName}</p>
-            {product && (
-              <p className="text-cyan-400 mt-1">
-                {formatPrice(product.price, product.currency)}
-              </p>
-            )}
-            <p className="text-slate-400 mt-4 max-w-md mx-auto">
+            <p className="text-xl text-slate-200 font-medium mt-4">{product.name}</p>
+            <p className="text-cyan-400 mt-1">
+              {formatPrice(product.price, product.currency)}
+            </p>
+            <p className="text-slate-400 mt-4 max-w-md mx-auto text-sm leading-relaxed">
               {thankYouText ?? "Preparing your personalized message…"}
             </p>
           </>

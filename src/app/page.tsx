@@ -1,25 +1,43 @@
 "use client";
 
+import { useRef } from "react";
 import { DemoFlowSteps } from "@/components/DemoFlowSteps";
 import { HeroSection } from "@/components/HeroSection";
+import { JudgeModeButton } from "@/components/JudgeModeButton";
 import { LiveSalesPanel } from "@/components/LiveSalesPanel";
 import { ProductCard } from "@/components/ProductCard";
-import { VoiceAssistant } from "@/components/VoiceAssistant";
+import {
+  VoiceAssistant,
+  type VoiceAssistantHandle,
+} from "@/components/VoiceAssistant";
 import { WhyItMatters } from "@/components/WhyItMatters";
+import { ConversationFunnel } from "@/components/ConversationFunnel";
 import { getAllProducts } from "@/lib/products";
 
 export default function HomePage() {
+  const assistantRef = useRef<VoiceAssistantHandle>(null);
+
   function handleStartTalking() {
     document.getElementById("voice-assistant")?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function handleRunJudgeDemo() {
+    void assistantRef.current?.runJudgeDemo();
   }
 
   const products = getAllProducts();
 
   return (
     <>
-      <HeroSection onStartTalking={handleStartTalking} />
+      <HeroSection
+        onStartTalking={handleStartTalking}
+        onRunJudgeDemo={handleRunJudgeDemo}
+      />
       <DemoFlowSteps />
-      <VoiceAssistant id="voice-assistant" />
+      <div className="max-w-6xl mx-auto px-4 flex justify-center -mt-4 mb-2">
+        <JudgeModeButton onRun={handleRunJudgeDemo} />
+      </div>
+      <VoiceAssistant ref={assistantRef} id="voice-assistant" />
       <LiveSalesPanel />
       <section className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-slate-100 mb-2">Digital products</h2>
@@ -33,6 +51,7 @@ export default function HomePage() {
         </div>
       </section>
       <WhyItMatters />
+      <ConversationFunnel />
     </>
   );
 }

@@ -2,18 +2,27 @@ import { NextResponse } from "next/server";
 import { getProductById } from "@/lib/products";
 import { getAppUrl, getStripe } from "@/lib/stripe";
 
+function buildDemoSuccessUrl(
+  productId: string,
+  customerName?: string,
+  userIntent?: string
+): string {
+  const appUrl = getAppUrl();
+  const params = new URLSearchParams({
+    demo: "1",
+    productId,
+    customerName: customerName ?? "Demo Guest",
+  });
+  if (userIntent?.trim()) {
+    params.set("userIntent", userIntent.trim().slice(0, 200));
+  }
+  return `${appUrl}/checkout/success?${params.toString()}`;
+}
+
 export async function POST(request: Request) {
   try {
-    const stripe = getStripe();
-    if (!stripe) {
-      return NextResponse.json(
-        { error: "Stripe is not configured. Add STRIPE_SECRET_KEY to .env.local" },
-        { status: 503 }
-      );
-    }
-
     const body = await request.json();
-    const { productId, customerName, customerEmail } = body;
+    const { productId, customerName, customerEmail, userIntent } = body;
 
     if (!productId || typeof productId !== "string") {
       return NextResponse.json(
@@ -25,6 +34,14 @@ export async function POST(request: Request) {
     const product = getProductById(productId);
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    const stripe = getStripe();
+    if (!stripe) {
+      return NextResponse.json({
+        demo: true,
+        url: buildDemoSuccessUrl(productId, customerName, userIntent),
+      });
     }
 
     const appUrl = getAppUrl();
@@ -47,6 +64,7 @@ export async function POST(request: Request) {
       metadata: {
         productId: product.id,
         customerName: customerName ?? "",
+        userIntent: (userIntent ?? "").slice(0, 500),
       },
       customer_email: customerEmail || undefined,
       success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

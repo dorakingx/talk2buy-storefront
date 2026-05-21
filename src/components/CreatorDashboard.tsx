@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   dashboardStats,
+  funnelMetrics,
   recentPurchases,
   generatedAudioLog,
 } from "@/lib/mock-data";
@@ -48,6 +49,21 @@ export function CreatorDashboard() {
           label="Voice messages"
           value={String(dashboardStats.voiceMessagesGenerated)}
         />
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 mb-8">
+        <h2 className="text-lg font-semibold text-slate-100 mb-1">Voice commerce funnel</h2>
+        <p className="text-sm text-slate-400 mb-4 italic">
+          Voice previews convert passive visitors into confident buyers.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <MetricCard label="Conversations" value={String(funnelMetrics.voiceConversationsToday)} />
+          <MetricCard label="Recommendations" value={String(funnelMetrics.recommendationsGenerated)} />
+          <MetricCard label="Preview plays" value={String(funnelMetrics.voicePreviewPlays)} />
+          <MetricCard label="Checkout starts" value={String(funnelMetrics.stripeCheckoutStarts)} />
+          <MetricCard label="Purchases" value={String(funnelMetrics.purchasesCompleted)} />
+          <MetricCard label="Conv. lift" value={funnelMetrics.estimatedConversionLift} />
+        </div>
       </div>
 
       <div className="mb-8">

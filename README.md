@@ -1,23 +1,55 @@
-# Talk-to-Buy Storefront
+# Talk2Buy Storefront
 
-AI voice commerce platform for creators — an ElevenLabs-powered sales assistant that recommends products, speaks to customers, and drives purchases through Stripe.
+**Voice is not just content. Voice is the sales interface.**
 
-## Demo flow (60–90s video)
+Talk2Buy is a voice-first commerce platform for digital creators. Visitors talk with an AI sales assistant, hear personalized ElevenLabs previews, pay through Stripe, and receive a spoken thank-you tied to their original intent.
 
-1. Land on hero → click **Try the voice demo**
-2. Watch auto intro + tap **I want to learn quantum computing**
-3. See **AI Recommended for You** → **Hear sample**
-4. **Buy with Stripe** (or **Try demo checkout** without API keys)
-5. Success page: personalized thank-you audio + share
-6. Cut to **Dashboard** for metrics and revenue chart
+Built for the **ElevenLabs x Stripe** hackathon.
 
-## Tech stack
+## One-sentence pitch
 
-- Next.js 16 (App Router)
-- TypeScript · Tailwind CSS
-- Stripe Checkout · ElevenLabs TTS · Rule-based assistant (optional OpenAI)
+Turn live conversations into product recommendations, voice previews, and instant Stripe checkout — without a static, impersonal storefront.
 
-## Getting started
+## Problem
+
+Creators struggle to convert visitors into buyers. Static product pages do not explain fit personally, and text-only chatbots feel like support — not sales.
+
+## Solution
+
+An AI voice storefront where:
+
+1. The visitor **talks** (push-to-talk or quick replies)
+2. The assistant **recommends** with match score and structured reasons
+3. **ElevenLabs** plays a personalized voice preview (not generic product copy)
+4. **Stripe** completes the purchase
+5. A **personalized thank-you audio** closes the loop using conversation context
+
+## How ElevenLabs is used
+
+- Assistant replies spoken after each recommendation
+- **Hear sample** generates a short preview from the visitor's intent + product fit
+- Post-purchase thank-you message via `/api/generate-voice`
+- Demo mode: browser SpeechSynthesis fallback with clear labeling
+
+## How Stripe is used
+
+- Stripe Checkout for real payments when `STRIPE_SECRET_KEY` is set
+- Metadata stores `productId`, `customerName`, and `userIntent`
+- **Demo checkout** when Stripe is not configured (client + API both return a success URL)
+
+## Demo flow (watch the live progress bar)
+
+| Step | What happens |
+|------|----------------|
+| Talk | User sends a message |
+| Recommend | AI returns product + match |
+| Hear sample | Personalized ElevenLabs preview |
+| Pay with Stripe | Checkout or demo redirect |
+| Personal audio | Thank-you on success page |
+
+**Judge tip:** Click **Run 30-sec demo** on the hero for an automated walkthrough.
+
+## Quick start
 
 ```bash
 npm install
@@ -27,34 +59,71 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Environment variables
+### Demo mode (no API keys)
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_APP_URL` | Yes | App URL for Stripe redirects |
-| `STRIPE_SECRET_KEY` | For live checkout | Without it, demo checkout is used |
-| `ELEVENLABS_API_KEY` | For ElevenLabs audio | Without it, browser SpeechSynthesis fallback |
-| `ELEVENLABS_VOICE_ID` | With ElevenLabs | Voice ID from ElevenLabs library |
-| `OPENAI_API_KEY` | Optional | GPT-based assistant replies |
+The app works out of the box:
+
+- Rule-based assistant + quick replies
+- Browser voice for previews and thank-you
+- Demo checkout → success page with personalized copy from `localStorage` context
+
+### Live mode
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_APP_URL` | Stripe redirect URLs |
+| `STRIPE_SECRET_KEY` | Real Stripe Checkout |
+| `ELEVENLABS_API_KEY` | ElevenLabs TTS |
+| `ELEVENLABS_VOICE_ID` | Voice ID from ElevenLabs library |
+| `OPENAI_API_KEY` | Optional GPT assistant replies |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  Visitor[Visitor] --> VA[VoiceAssistant]
+  VA --> API_A["/api/assistant"]
+  VA --> API_V["/api/generate-voice"]
+  VA --> API_C["/api/create-checkout-session"]
+  API_V --> EL[ElevenLabs]
+  API_C --> ST[Stripe]
+  API_C --> Demo[Demo success URL]
+  ST --> Success[Success page]
+  Demo --> Success
+  Success --> API_V
+  VA --> LS[localStorage demo context]
+  LS --> Success
+```
 
 ## Project structure
 
 ```
 src/
-  app/              # Pages and API routes
-  components/       # VoiceOrb, VoiceAssistant, RecommendationCard, etc.
-  lib/              # products, assistant, stripe, elevenlabs, voice-client
+  app/           # Pages + API routes
+  components/    # VoiceOrb, VoiceAssistant, RecommendationCard, etc.
+  hooks/         # useDemoFlow
+  lib/           # products, assistant, voice-scripts, demo-storage, voice-client
   types/
 ```
 
-## Pages
+## Scripts
 
-- `/` — Voice-first storefront, products, pitch
-- `/checkout/success` — Post-payment (Stripe or `?demo=1&productId=...`)
-- `/dashboard` — Creator SaaS dashboard with chart
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
 
-## Deploy to Vercel
+## Demo video
 
-1. Import from GitHub
-2. Add env vars from `.env.example`
-3. Set `NEXT_PUBLIC_APP_URL` to production URL
+See [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for a 60–90 second recording script.
+
+## Deploy (Vercel)
+
+1. Import the GitHub repo
+2. Add environment variables from `.env.example`
+3. Set `NEXT_PUBLIC_APP_URL` to your production domain
+
+## License
+
+MIT

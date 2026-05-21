@@ -1,13 +1,23 @@
+export const funnelMetrics = {
+  voiceConversationsToday: 47,
+  recommendationsGenerated: 38,
+  voicePreviewPlays: 29,
+  stripeCheckoutStarts: 14,
+  purchasesCompleted: 6,
+  estimatedConversionLift: "+18%",
+};
+
 export const liveSalesStats = {
   revenueToday: 12400,
   conversionRate: 4.8,
   conversionDelta: "+12% vs last week",
-  voiceInteractions: 47,
+  voiceInteractions: funnelMetrics.voiceConversationsToday,
   purchasedProducts: [
     { name: "AI Art Prompt Pack", count: 3 },
     { name: "Quantum Computing Beginner Audio Guide", count: 2 },
     { name: "Cyberpunk Short Story Audio", count: 1 },
   ],
+  funnel: funnelMetrics,
 };
 
 export const dashboardStats = {
@@ -19,6 +29,7 @@ export const dashboardStats = {
   conversionRate: 4.8,
   conversionDelta: "+12% vs last week",
   topRecommendedProduct: "Quantum Computing Beginner Audio Guide",
+  funnel: funnelMetrics,
 };
 
 export const revenueByDay = [

@@ -38,6 +38,7 @@ export async function GET(request: Request) {
       productId,
       productName: product?.name ?? session.line_items?.data[0]?.description ?? null,
       paymentStatus: session.payment_status,
+      userIntent: session.metadata?.userIntent ?? null,
     });
   } catch (e) {
     console.error("Stripe session retrieve error:", e);

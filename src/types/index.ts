@@ -36,6 +36,7 @@ export interface StripeSessionResponse {
   productId: string | null;
   productName: string | null;
   paymentStatus: string;
+  userIntent?: string | null;
 }
 
 export interface VoiceGenerateResponse {
@@ -47,4 +48,10 @@ export interface VoiceGenerateResponse {
 export interface AppConfig {
   stripeEnabled: boolean;
   elevenLabsEnabled: boolean;
+}
+
+export interface CheckoutSessionResponse {
+  url?: string;
+  demo?: boolean;
+  error?: string;
 }

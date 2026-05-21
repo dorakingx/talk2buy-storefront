@@ -1,27 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { JudgeModeButton } from "./JudgeModeButton";
 
 interface HeroSectionProps {
   onStartTalking: () => void;
+  onRunJudgeDemo?: () => void;
 }
 
-export function HeroSection({ onStartTalking }: HeroSectionProps) {
+export function HeroSection({ onStartTalking, onRunJudgeDemo }: HeroSectionProps) {
   return (
     <section className="gradient-hero py-20 md:py-28 px-4">
       <div className="max-w-4xl mx-auto text-center animate-fade-in">
         <p className="text-cyan-400 text-sm font-medium tracking-wider uppercase mb-4">
-          AI Voice Commerce · ElevenLabs + Stripe
+          ElevenLabs x Stripe Hackathon · Talk2Buy
         </p>
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-slate-100">
           Turn conversations into sales with an{" "}
           <span className="text-gradient">AI voice storefront</span>.
         </h1>
-        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-2">
           An ElevenLabs-powered sales assistant that recommends products, speaks
           to customers, and drives purchases through Stripe.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <p className="text-sm text-violet-400/90 mb-10 italic">
+          Voice is not just content. Voice is the sales interface.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
             type="button"
             onClick={onStartTalking}
@@ -35,6 +40,7 @@ export function HeroSection({ onStartTalking }: HeroSectionProps) {
           >
             View creator dashboard
           </Link>
+          {onRunJudgeDemo && <JudgeModeButton onRun={onRunJudgeDemo} />}
         </div>
       </div>
     </section>
