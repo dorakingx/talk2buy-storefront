@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getProductById, formatPrice } from "@/lib/products";
 import { loadDemoContext, saveDemoContext } from "@/lib/demo-storage";
 import { buildPersonalizedPreview } from "@/lib/voice-scripts";
@@ -23,6 +23,7 @@ interface RecommendationCardProps {
   highlight?: boolean;
   onVoiceStateChange?: (state: VoiceOrbState) => void;
   onSampleEnded?: () => void;
+  autoDemo?: boolean;
 }
 
 export function RecommendationCard({
@@ -37,21 +38,24 @@ export function RecommendationCard({
   highlight = false,
   onVoiceStateChange,
   onSampleEnded,
+  autoDemo = false,
 }: RecommendationCardProps) {
   const product = getProductById(productId);
   const [sampleLoading, setSampleLoading] = useState(false);
   const { showToast } = useToast();
   const recordingMode = useRecordingMode();
-
-  if (!product) return null;
+  const autoSampleStartedRef = useRef(false);
+  const autoSampleAdvancedRef = useRef(false);
+  const handleHearSampleRef = useRef<() => void | Promise<void>>(() => {});
+  const onSampleEndedRef = useRef<(() => void) | undefined>(onSampleEnded);
 
   const ctx = loadDemoContext();
   const intent = userIntent ?? ctx?.userIntent ?? "";
-  const outcome = expectedOutcome ?? ctx?.expectedOutcome ?? product.whatYouGet;
+  const outcome = expectedOutcome ?? ctx?.expectedOutcome ?? product?.whatYouGet ?? "";
   const signals = matchSignals.length > 0 ? matchSignals : ctx?.matchSignals ?? [];
 
-  async function handleHearSample() {
-    if (isVoicePlaying() || sampleLoading) return;
+  const handleHearSample = useCallback(async () => {
+    if (!product || isVoicePlaying() || sampleLoading) return;
 
     setSampleLoading(true);
     setDemoStep("hear_sample");
@@ -79,7 +83,49 @@ export function RecommendationCard({
     } finally {
       setSampleLoading(false);
     }
-  }
+  }, [
+    cta,
+    intent,
+    matchScore,
+    onSampleEnded,
+    onVoiceStateChange,
+    product,
+    productId,
+    sampleLoading,
+    showToast,
+    whatYouGet,
+    whyItFits,
+  ]);
+
+  useEffect(() => {
+    handleHearSampleRef.current = handleHearSample;
+  }, [handleHearSample]);
+
+  useEffect(() => {
+    onSampleEndedRef.current = onSampleEnded;
+  }, [onSampleEnded]);
+
+  useEffect(() => {
+    if (!autoDemo || autoSampleStartedRef.current) return;
+    autoSampleStartedRef.current = true;
+
+    const sampleTimer = window.setTimeout(() => {
+      void handleHearSampleRef.current();
+    }, 6500);
+
+    const advanceTimer = window.setTimeout(() => {
+      if (autoSampleAdvancedRef.current) return;
+      autoSampleAdvancedRef.current = true;
+      onSampleEndedRef.current?.();
+    }, 15500);
+
+    return () => {
+      window.clearTimeout(sampleTimer);
+      window.clearTimeout(advanceTimer);
+    };
+  }, [autoDemo]);
+
+  if (!product) return null;
 
   return (
     <div
@@ -122,7 +168,7 @@ export function RecommendationCard({
       <p className="text-cyan-400 font-semibold">{formatPrice(product.price, product.currency)}</p>
       <p className="text-sm text-slate-300 mt-2">{product.shortBenefit}</p>
 
-      <details className="mt-4 group">
+      <details className="mt-4 group" open={recordingMode || autoDemo}>
         <summary className="text-sm text-violet-300 cursor-pointer hover:text-violet-200 list-none flex items-center gap-2">
           <span className="group-open:rotate-90 transition-transform">▸</span>
           Why this recommendation?

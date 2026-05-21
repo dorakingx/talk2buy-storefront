@@ -20,6 +20,7 @@ function SuccessContent() {
   const demoProductId = searchParams.get("productId");
   const demoCustomerName = searchParams.get("customerName") ?? "Guest";
   const queryIntent = searchParams.get("userIntent");
+  const autoDemo = searchParams.get("autoplay") === "1";
 
   const [stripeSession, setStripeSession] = useState<StripeSessionResponse | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -152,6 +153,16 @@ function SuccessContent() {
     setVoiceLoading(false);
     setReplayLoading(false);
   }
+
+  useEffect(() => {
+    if (!autoDemo || !session) return;
+
+    const timer = window.setTimeout(() => {
+      window.location.href = "/dashboard?recording=1&autoplay=1";
+    }, 15000);
+
+    return () => window.clearTimeout(timer);
+  }, [autoDemo, session]);
 
   function handleShare() {
     navigator.clipboard?.writeText(window.location.href);

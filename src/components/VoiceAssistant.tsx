@@ -30,10 +30,11 @@ export interface VoiceAssistantHandle {
 interface VoiceAssistantProps {
   id?: string;
   onJudgeGuidePhase?: (phase: JudgeGuidePhase) => void;
+  autoDemo?: boolean;
 }
 
 export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantProps>(
-  function VoiceAssistant({ id = "voice-assistant", onJudgeGuidePhase }, ref) {
+  function VoiceAssistant({ id = "voice-assistant", onJudgeGuidePhase, autoDemo = false }, ref) {
     const [messages, setMessages] = useState<ChatMessage[]>(() => [
       { id: "0", role: "assistant", content: getGreeting() },
     ]);
@@ -296,6 +297,7 @@ export const VoiceAssistant = forwardRef<VoiceAssistantHandle, VoiceAssistantPro
             highlight={cardHighlight}
             onVoiceStateChange={setOrbState}
             onSampleEnded={() => onJudgeGuidePhase?.("awaiting_checkout")}
+            autoDemo={autoDemo}
           />
         )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DemoFlowSteps } from "@/components/DemoFlowSteps";
 import { DemoReadinessBanner } from "@/components/DemoReadinessBanner";
 import { HeroSection } from "@/components/HeroSection";
@@ -16,12 +16,53 @@ import {
 import { useToast } from "@/components/Toast";
 import { WhyItMatters } from "@/components/WhyItMatters";
 import { ConversationFunnel } from "@/components/ConversationFunnel";
+import { setDemoStep } from "@/lib/demo-storage";
 import { getAllProducts } from "@/lib/products";
 
 export default function HomePage() {
   const assistantRef = useRef<VoiceAssistantHandle>(null);
   const [judgeGuidePhase, setJudgeGuidePhase] = useState<JudgeGuidePhase>("idle");
   const { showToast } = useToast();
+  const autoStartedRef = useRef(false);
+  const autoCheckoutRef = useRef(false);
+
+  const autoDemo =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("autoplay") === "1";
+
+  useEffect(() => {
+    if (!autoDemo || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+
+    const timer = window.setTimeout(() => {
+      void assistantRef.current?.runJudgeDemo();
+    }, 6500);
+
+    return () => window.clearTimeout(timer);
+  }, [autoDemo]);
+
+  useEffect(() => {
+    if (!autoDemo || judgeGuidePhase !== "awaiting_checkout" || autoCheckoutRef.current) {
+      return;
+    }
+
+    autoCheckoutRef.current = true;
+    setDemoStep("pay");
+
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({
+        recording: "1",
+        autoplay: "1",
+        demo: "1",
+        productId: "quantum-audio-guide",
+        customerName: "Demo Guest",
+        userIntent: "I want to learn quantum computing",
+      });
+      window.location.href = `/checkout/success?${params.toString()}`;
+    }, 6500);
+
+    return () => window.clearTimeout(timer);
+  }, [autoDemo, judgeGuidePhase]);
 
   function handleStartTalking() {
     document.getElementById("voice-assistant")?.scrollIntoView({ behavior: "smooth" });
@@ -54,6 +95,7 @@ export default function HomePage() {
         ref={assistantRef}
         id="voice-assistant"
         onJudgeGuidePhase={setJudgeGuidePhase}
+        autoDemo={autoDemo}
       />
       <JudgeDemoGuide phase={judgeGuidePhase} onDismiss={handleDismissJudgeGuide} />
       <LiveSalesPanel />
