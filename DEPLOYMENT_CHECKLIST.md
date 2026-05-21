@@ -45,13 +45,15 @@ Copy `.env.example` to `.env.local` and set as needed:
 
 ## Pre-submission
 
-- [ ] Update [SUBMISSION_URLS.md](SUBMISSION_URLS.md) with real Vercel URL (sync README / HACKATHON)
+- [x] Update [SUBMISSION_URLS.md](SUBMISSION_URLS.md) with real Vercel URL (sync README / HACKATHON)
 - [ ] Add demo video link in SUBMISSION_URLS.md after recording
 - [ ] Screenshots committed under `docs/screenshots/`
 - [ ] GitHub repo is public
 
 ## Deploy (Vercel)
 
-- [ ] Import repo and add env vars from `.env.example`
-- [ ] Set `NEXT_PUBLIC_APP_URL` to production URL
-- [ ] Smoke-test judge demo and one real or demo checkout on production URL
+- [x] Deployed to https://talk2buy-storefront.vercel.app (project `doraking/talk2buy-storefront`)
+- [ ] Import repo and add env vars from `.env.example` *(Stripe keys etc. if live mode needed)*
+- [ ] Set `NEXT_PUBLIC_APP_URL` to `https://talk2buy-storefront.vercel.app`
+- [x] Smoke-test production (`/api/config`, pages load)
+- [ ] Smoke-test judge demo and one real or demo checkout on production URL in browser

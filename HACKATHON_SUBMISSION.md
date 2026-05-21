@@ -42,12 +42,12 @@ Record with `?recording=1` for stable layout.
 
 ## Links
 
-See [SUBMISSION_URLS.md](SUBMISSION_URLS.md) for the canonical list (update live demo after Vercel deploy).
+See [SUBMISSION_URLS.md](SUBMISSION_URLS.md) for the canonical list.
 
 | Resource | URL |
 |----------|-----|
 | GitHub | https://github.com/dorakingx/talk2buy-storefront |
-| Live demo | https://YOUR-APP.vercel.app *(set in SUBMISSION_URLS.md after deploy)* |
+| Live demo | https://talk2buy-storefront.vercel.app |
 | Demo video | Add YouTube/Loom link in SUBMISSION_URLS.md after recording |
 
 ## Before submit

@@ -8,7 +8,7 @@ Built with **ElevenLabs** · Powered by **Stripe** · **Demo mode** available
 
 Built for the **ElevenLabs x Stripe** hackathon. Judges: see [HACKATHON_SUBMISSION.md](HACKATHON_SUBMISSION.md).
 
-**Links:** [SUBMISSION_URLS.md](SUBMISSION_URLS.md) (live demo + video — update after deploy)
+**Live demo:** [talk2buy-storefront.vercel.app](https://talk2buy-storefront.vercel.app) · **Links:** [SUBMISSION_URLS.md](SUBMISSION_URLS.md) (demo video when recorded)
 
 ## Quick start
 
@@ -33,7 +33,7 @@ Open [http://localhost:3000](http://localhost:3000). Header pill shows **Demo mo
 4. Demo checkout → success **experience loop** + thank-you audio
 5. Dashboard — funnel + voice commerce analytics
 
-Recording tip: use [http://localhost:3000/?recording=1](http://localhost:3000/?recording=1) for a stable layout. Script: [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+Recording tip: use [/?recording=1](https://talk2buy-storefront.vercel.app/?recording=1) on production (or localhost when developing). Script: [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
 
 ## Screenshots
 
@@ -49,14 +49,21 @@ Recording tip: use [http://localhost:3000/?recording=1](http://localhost:3000/?r
 
 ## Deploy (Vercel)
 
-1. Import [github.com/dorakingx/talk2buy-storefront](https://github.com/dorakingx/talk2buy-storefront)
-2. Add variables from `.env.example`
-3. Set `NEXT_PUBLIC_APP_URL` to `https://YOUR-APP.vercel.app`
-4. Update [SUBMISSION_URLS.md](SUBMISSION_URLS.md) with your Vercel URL, then sync README / HACKATHON
+Production: **[talk2buy-storefront.vercel.app](https://talk2buy-storefront.vercel.app)** (project `doraking/talk2buy-storefront`).
+
+To redeploy or configure env vars:
+
+1. Repo: [github.com/dorakingx/talk2buy-storefront](https://github.com/dorakingx/talk2buy-storefront)
+2. Add variables from `.env.example` in the [Vercel dashboard](https://vercel.com/doraking/talk2buy-storefront)
+3. Set `NEXT_PUBLIC_APP_URL` to `https://talk2buy-storefront.vercel.app`
+4. CLI: `vercel link --project talk2buy-storefront` then `vercel deploy --prod`
+
+Canonical URLs: [SUBMISSION_URLS.md](SUBMISSION_URLS.md).
 
 ## Pre-submission checklist
 
-- [ ] App deployed; `NEXT_PUBLIC_APP_URL` set on Vercel
+- [x] App deployed — https://talk2buy-storefront.vercel.app
+- [ ] `NEXT_PUBLIC_APP_URL` set on Vercel to production URL
 - [ ] GitHub repo public
 - [ ] Demo mode works without keys
 - [ ] Live mode tested if keys configured
